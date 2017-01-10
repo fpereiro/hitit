@@ -1,5 +1,5 @@
 /*
-hitit - v0.1.0
+hitit - v0.1.1
 
 Written by Federico Pereiro (fpereiro@gmail.com) and released into the public domain.
 
@@ -26,6 +26,7 @@ Please refer to readme.md to read the annotated source (but not yet!).
       if (teishi.stop ([
          ['options', o, 'object'],
          function () {return [
+            ['options.tag', o.tag, 'string'],
             ['options.port', o.port, ['integer', 'function', 'undefined'], 'oneOf'],
             [type (o.port) === 'function', ['options.port', o.port, {min: 1, max: 65535}, teishi.test.range]],
             ['options.host',   o.host,   ['string', 'function', 'undefined'], 'oneOf'],
@@ -52,9 +53,7 @@ Please refer to readme.md to read the annotated source (but not yet!).
          else                         return w;
       }
 
-      if (type (o.headers) === 'function') o.headers = resolve (o.headers);
-
-      o.headers = dale.obj (o.headers || {}, resolve (state.headers) || {}, function (v, k) {return [k, v]});
+      o.headers = dale.obj (resolve (o.headers) || {}, resolve (state.headers) || {}, function (v, k) {return [k, v]});
 
       o.body = resolve (o.body);
 
@@ -82,6 +81,7 @@ Please refer to readme.md to read the annotated source (but not yet!).
 
          response.on ('end', function () {
             var rdata = {
+               tag: o.tag,
                code: response.statusCode,
                headers: response.headers,
                body: response.body,
@@ -147,7 +147,7 @@ Please refer to readme.md to read the annotated source (but not yet!).
       preproc (seq);
 
       var CB = function (error, data) {
-         log ('Starting request', (counter + 1) + '/' + fseq.length);
+         log ('Starting request', fseq [counter].tag, '(' + (counter + 1) + '/' + fseq.length + ')');
          h.one (state, fseq [counter++], function (error, data) {
             if (error) return cb (error, hist);
             hist.push (data);
@@ -162,12 +162,13 @@ Please refer to readme.md to read the annotated source (but not yet!).
 
    h.stdmap = function (req) {
       return {
-         method:  req [0],
-         path:    req [1],
-         headers: req [2],
-         body:    req [3],
-         code:    req [4],
-         apres:   req [5]
+         tag:     req [0],
+         method:  req [1],
+         path:    req [2],
+         headers: req [3],
+         body:    req [4],
+         code:    req [5],
+         apres:   req [6]
       }
    }
 

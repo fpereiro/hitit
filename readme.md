@@ -4,7 +4,7 @@ hitit is a minimalistic tool for testing an HTTP API.
 
 ## Current status of the project
 
-The current version of hitit, v0.1.0, is considered to be *unstable* and *incomplete*. [Suggestions](https://github.com/fpereiro/hitit/issues) and [patches](https://github.com/fpereiro/hitit/pulls) are welcome. Future changes planned are:
+The current version of hitit, v0.1.1, is considered to be *unstable* and *incomplete*. [Suggestions](https://github.com/fpereiro/hitit/issues) and [patches](https://github.com/fpereiro/hitit/pulls) are welcome. Future changes planned are:
 
 - Support for `multipart` uploads and downloads.
 - Support for concurrent testing (a.k.a stress testing).
