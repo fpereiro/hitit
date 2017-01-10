@@ -13,7 +13,7 @@ The current version of hitit, v0.1.0, is considered to be *unstable* and *incomp
 
 ## Installation
 
-The dependencies of cocholate are two:
+The dependencies of hitit are two:
 
 - [dale](https://github.com/fpereiro/dale)
 - [teishi](https://github.com/fpereiro/teishi)
@@ -28,4 +28,4 @@ Annotated source code will be forthcoming when the library stabilizes.
 
 ## License
 
-cocholate is written by Federico Pereiro (fpereiro@gmail.com) and released into the public domain.
+hitit is written by Federico Pereiro (fpereiro@gmail.com) and released into the public domain.
