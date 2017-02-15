@@ -1,5 +1,5 @@
 /*
-hitit - v0.1.1
+hitit - v0.1.2
 
 Written by Federico Pereiro (fpereiro@gmail.com) and released into the public domain.
 
@@ -38,6 +38,7 @@ Please refer to readme.md to read the annotated source (but not yet!).
             ['options.headers', o.headers, ['object', 'function', 'undefined'], 'oneOf'],
             ['options.code', o.code, [undefined, 0, -1].concat (dale.do (http.STATUS_CODES, function (v, k) {return parseInt (k)})), teishi.test.equal, 'oneOf'],
             ['options.apres', o.apres, ['undefined', 'function'], 'oneOf'],
+            ['options.apres', o.delay, ['undefined', 'integer'], 'oneOf'],
             ['state', state, 'object'],
          ]},
          ['cb', cb, 'function']
@@ -98,12 +99,14 @@ Please refer to readme.md to read the annotated source (but not yet!).
             }
 
             if (rdata.code !== (o.code || 200)) return cb (rdata);
-            if (o.apres) {
-               var result = o.apres (state, o, rdata, cb);
-               if (result === undefined) return;
-               return result ? cb (null, rdata) : cb (rdata);
-            }
-            cb (null, rdata);
+            setTimeout (function () {
+               if (o.apres) {
+                  var result = o.apres (state, o, rdata, cb);
+                  if (result === undefined) return;
+                  return result ? cb (null, rdata) : cb (rdata);
+               }
+               cb (null, rdata);
+            }, o.delay || 0);
          });
 
          response.on ('error', function (error) {
@@ -168,7 +171,8 @@ Please refer to readme.md to read the annotated source (but not yet!).
          headers: req [3],
          body:    req [4],
          code:    req [5],
-         apres:   req [6]
+         apres:   req [6],
+         delay:   req [7]
       }
    }
 
