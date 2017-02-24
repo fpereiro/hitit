@@ -4,12 +4,11 @@ hitit is a minimalistic tool for testing an HTTP API.
 
 ## Current status of the project
 
-The current version of hitit, v0.1.2, is considered to be *unstable* and *incomplete*. [Suggestions](https://github.com/fpereiro/hitit/issues) and [patches](https://github.com/fpereiro/hitit/pulls) are welcome. Future changes planned are:
+The current version of hitit, v0.2.0, is considered to be *unstable* and *incomplete*. [Suggestions](https://github.com/fpereiro/hitit/issues) and [patches](https://github.com/fpereiro/hitit/pulls) are welcome. Future changes planned are:
 
 - Support for `multipart` uploads and downloads.
 - Support for concurrent testing (a.k.a stress testing).
 - Basic profiling.
-- HTTPS support.
 
 ## Installation
 
@@ -22,7 +21,7 @@ To install, type `npm i hitit`.
 
 ## Source code
 
-The complete source code is contained in `hitit.js`. It is about 180 lines long.
+The complete source code is contained in `hitit.js`. It is about 190 lines long.
 
 Annotated source code will be forthcoming when the library stabilizes.
 

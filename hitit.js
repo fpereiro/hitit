@@ -1,5 +1,5 @@
 /*
-hitit - v0.1.2
+hitit - v0.2.0
 
 Written by Federico Pereiro (fpereiro@gmail.com) and released into the public domain.
 
@@ -12,6 +12,7 @@ Please refer to readme.md to read the annotated source (but not yet!).
 
    var fs      = require ('fs');
    var http    = require ('http');
+   var https   = require ('https');
 
    var dale    = require ('dale');
    var teishi  = require ('teishi');
@@ -39,14 +40,17 @@ Please refer to readme.md to read the annotated source (but not yet!).
             ['options.code', o.code, [undefined, 0, -1].concat (dale.do (http.STATUS_CODES, function (v, k) {return parseInt (k)})), teishi.test.equal, 'oneOf'],
             ['options.apres', o.apres, ['undefined', 'function'], 'oneOf'],
             ['options.apres', o.delay, ['undefined', 'integer'], 'oneOf'],
+            ['options.https', o.https, ['undefined', 'boolean'], 'oneOf'],
+            ['options.rejectUnauthorized', o.https, ['undefined', 'boolean'], 'oneOf'],
             ['state', state, 'object'],
          ]},
          ['cb', cb, 'function']
       ], function (error) {
-         cb ({
+         if (type (cb) === 'function') cb ({
             code: -2,
             error: error
          });
+         else log (error);
       })) return;
 
       var resolve = function (w) {
@@ -70,9 +74,12 @@ Please refer to readme.md to read the annotated source (but not yet!).
          method:   resolve (o.method) || resolve (state.method),
          headers:  o.headers,
          path:     resolve (o.path),
+         rejectUnauthorized: ! o.rejectUnauthorized === false
       };
 
-      var request = http.request (opt, function (response) {
+      var protocol = o.https ? https : http;
+
+      var request = protocol.request (opt, function (response) {
          response.setEncoding ('utf8');
          response.body = '';
 
