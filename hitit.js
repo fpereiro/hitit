@@ -1,5 +1,5 @@
 /*
-hitit - v0.2.0
+hitit - v0.2.1
 
 Written by Federico Pereiro (fpereiro@gmail.com) and released into the public domain.
 
@@ -74,10 +74,10 @@ Please refer to readme.md to read the annotated source (but not yet!).
          method:   resolve (o.method) || resolve (state.method),
          headers:  o.headers,
          path:     resolve (o.path),
-         rejectUnauthorized: ! o.rejectUnauthorized === false
+         rejectUnauthorized: ! (o.rejectUnauthorized === undefined ? resolve (state.rejectUnauthorized) === false : o.rejectUnauthorized === false)
       };
 
-      var protocol = o.https ? https : http;
+      var protocol = (o.https === undefined ? resolve (state.https) : resolve (o.https)) ? https : http;
 
       var request = protocol.request (opt, function (response) {
          response.setEncoding ('utf8');
