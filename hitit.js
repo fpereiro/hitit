@@ -1,5 +1,5 @@
 /*
-hitit - v0.2.1
+hitit - v0.3.0
 
 Written by Federico Pereiro (fpereiro@gmail.com) and released into the public domain.
 
@@ -13,8 +13,10 @@ Please refer to readme.md to read the annotated source (but not yet!).
    var fs      = require ('fs');
    var http    = require ('http');
    var https   = require ('https');
+   var Path    = require ('path');
 
    var dale    = require ('dale');
+   var mime    = require ('mime');
    var teishi  = require ('teishi');
 
    var type    = teishi.t;
@@ -62,7 +64,27 @@ Please refer to readme.md to read the annotated source (but not yet!).
 
       o.body = resolve (o.body);
 
-      if (teishi.complex (o.body)) {
+      if (type (o.body) === 'object' && o.body.multipart) {
+         var boundary = Math.floor (Math.random () * Math.pow (10, 16));
+         var content = type (o.body.multipart) === 'array' ? o.body.multipart : [o.body.multipart];
+         o.body = '';
+         o.headers ['content-type'] = 'multipart/form-data; boundary=' + boundary;
+         dale.do (content, function (v) {
+            if (type (v) !== 'object') return log ('Invalid multipart file or field!');
+            if (v.path && ! v.filename) v.filename = Path.basename (v.path);
+
+                            o.body += '--' + boundary + '\r\n' + 'Content-Disposition: form-data; name="' + v.name + '";';
+            if (v.filename) o.body += ' filename="' + encodeURIComponent (v.filename) + '"';
+            var contentType = v.contentType || (v.path ? mime.lookup (v.path) : (teishi.complex (v.value) ? 'application/json' : 'text/plain'));
+                            o.body += '\r\nContent-Type: ' + contentType + '; charset=utf-8';
+                            o.body += '\r\n\r\n';
+                            o.body += v.path ? fs.readFileSync (v.path, 'utf8') : (teishi.complex (v.value) ? teishi.s (v.value) : v.value);
+                            o.body += '\r\n';
+         });
+         o.body += '--' + boundary + '--\r\n';
+      }
+
+      else if (teishi.complex (o.body)) {
          o.body = JSON.stringify (o.body);
          if (! o.headers ['content-type']) o.headers ['content-type'] = 'application/json';
       }
