@@ -1,5 +1,5 @@
 /*
-hitit - v1.0.0
+hitit - v1.1.0
 
 Written by Federico Pereiro (fpereiro@gmail.com) and released into the public domain.
 */
@@ -69,24 +69,10 @@ Written by Federico Pereiro (fpereiro@gmail.com) and released into the public do
 
       o.headers = dale.obj (o.headers || {}, teishi.c (state.headers) || {}, function (v, k) {return [k, v]});
 
-      if (type (o.body) === 'object' && o.body.multipart) {
+      var multipart = type (o.body) === 'object' && o.body.multipart;
+      if (multipart) {
          var boundary = Math.floor (Math.random () * Math.pow (10, 16));
-         var content = type (o.body.multipart) === 'array' ? o.body.multipart : [o.body.multipart];
-         o.body = '';
          o.headers ['content-type'] = 'multipart/form-data; boundary=' + boundary;
-         dale.do (content, function (v) {
-            if (type (v) !== 'object') return log ('Invalid multipart file or field!');
-            if (v.path && ! v.filename) v.filename = Path.basename (v.path);
-
-                            o.body += '--' + boundary + '\r\n' + 'Content-Disposition: form-data; name="' + v.name + '";';
-            if (v.filename) o.body += ' filename="' + encodeURIComponent (v.filename) + '"';
-            var contentType = v.contentType || (v.path ? mime.lookup (v.path) : (teishi.complex (v.value) ? 'application/json' : 'text/plain'));
-                            o.body += '\r\nContent-Type: ' + contentType + '; charset=utf-8';
-                            o.body += '\r\n\r\n';
-                            o.body += v.path ? fs.readFileSync (v.path, 'utf8') : (teishi.complex (v.value) ? teishi.s (v.value) : v.value);
-                            o.body += '\r\n';
-         });
-         o.body += '--' + boundary + '--\r\n';
       }
 
       else if (teishi.complex (o.body)) {
@@ -158,7 +144,39 @@ Written by Federico Pereiro (fpereiro@gmail.com) and released into the public do
          if (! timeout) cb ({code: -1, error: error.toString (), request: o});
       });
 
-      request.end (o.body);
+      if (! multipart) request.end (o.body);
+      else {
+         var content = type (o.body.multipart) === 'array' ? o.body.multipart : [o.body.multipart];
+
+         var queue = [], counter = 1, rwrite = function (what, enc, p) {
+            if (p === undefined) {
+               p = counter++;
+               queue.push (p);
+            }
+            if (Math.min.apply (Math, queue) === p) {
+               request.write (what, enc, function () {
+                  queue.splice (queue.indexOf (p), 1);
+                  if (queue.length === 0) request.end ();
+               });
+            }
+            else setTimeout (function () {
+               rwrite (what, enc, p);
+            }, 1);
+         }
+
+         dale.do (content, function (v) {
+            if (type (v) !== 'object') return log ('Invalid multipart file or field!', v);
+            if (v.path && ! v.filename) v.filename = Path.basename (v.path);
+            rwrite ('--' + boundary + '\r\n' + 'Content-Disposition: form-data; name="' + v.name + '";');
+            if (v.filename) rwrite (' filename="' + encodeURIComponent (v.filename) + '"');
+            var contentType = v.contentType || (v.path ? mime.lookup (v.path) : (teishi.complex (v.value) ? 'application/json' : 'text/plain'));
+            if (contentType !== 'application/octet-stream') rwrite ('\r\nContent-Type: ' + contentType + '; charset=utf-8');
+            rwrite ('\r\n\r\n');
+            rwrite (v.path ? fs.readFileSync (v.path, 'binary') : (teishi.complex (v.value) ? teishi.s (v.value) : v.value + ''), v.path ? 'binary' : 'utf8');
+            rwrite ('\r\n');
+         });
+         rwrite ('--' + boundary + '--\r\n');
+      }
    }
 
    h.seq = function (state, seq, cb, map) {
