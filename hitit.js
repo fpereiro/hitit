@@ -1,5 +1,5 @@
 /*
-hitit - v1.1.0
+hitit - v1.2.0
 
 Written by Federico Pereiro (fpereiro@gmail.com) and released into the public domain.
 */
@@ -53,7 +53,7 @@ Written by Federico Pereiro (fpereiro@gmail.com) and released into the public do
             })
          })},
          function () {return [
-            ['o.code', o.code, [undefined, 0, -1].concat (dale.do (http.STATUS_CODES, function (v, k) {return parseInt (k)})), teishi.test.equal, 'oneOf'],
+            ['o.code', o.code, ['*', undefined, 0, -1].concat (dale.do (http.STATUS_CODES, function (v, k) {return parseInt (k)})), teishi.test.equal, 'oneOf'],
             [o.port !== undefined, ['options.port', o.port, {min: 1, max: 65535}, teishi.test.range]],
             [o.method !== undefined, ['options.method', (o.method || ''    ).toLowerCase (), ['get', 'head', 'post', 'put', 'delete', 'trace', 'connect', 'patch', 'options'], teishi.test.equal, 'oneOf']],
          ]},
@@ -116,7 +116,7 @@ Written by Federico Pereiro (fpereiro@gmail.com) and released into the public do
                rdata.body = parsed;
             }
 
-            if (rdata.code !== (o.code || 200)) return cb (rdata);
+            if (o.code !== '*' && rdata.code !== (o.code || 200)) return cb (rdata);
             setTimeout (function () {
                if (o.apres) {
                   var result = o.apres (state, o, rdata, cb);
@@ -194,6 +194,7 @@ Written by Federico Pereiro (fpereiro@gmail.com) and released into the public do
 
       var preproc = function (seq) {
          dale.do (seq, function (v) {
+            if (! v || (type (v) === 'array' && v.length === 0)) return;
             if (type (v) === 'array' && teishi.complex (v [0])) preproc (v);
             else fseq.push (map ? map (v) : v);
          });

@@ -4,9 +4,8 @@ hitit is a minimalistic tool for testing an HTTP(S) API. It is a stopgap until I
 
 ## Current status of the project
 
-The current version of hitit, v1.1.0, is considered to be *somewhat stable* and *somewhat complete*. [Suggestions](https://github.com/fpereiro/hitit/issues) and [patches](https://github.com/fpereiro/hitit/pulls) are welcome. Future changes planned are:
+The current version of hitit, v1.2.0, is considered to be *somewhat stable* and *somewhat complete*. [Suggestions](https://github.com/fpereiro/hitit/issues) and [patches](https://github.com/fpereiro/hitit/pulls) are welcome. Future changes planned are:
 
-- Allow empty tests.
 - Support for concurrent testing (a.k.a stress testing).
 
 ## Installation
@@ -35,7 +34,7 @@ To do a single request, use `h.one`. This function takes three arguments: `state
 - `path`: optional string.
 - `headers`: optional object.
 - `body`: can be of any type. See below for more details.
-- `code`: any valid HTTP status code; defaults to 200. If the response has a different matching code, the request will be considered as a failure.
+- `code`: any valid HTTP status code; defaults to 200. If the response has a different matching code, the request will be considered as a failure. If you want the request to succeed in any case, you can use `'*'` as the status code.
 - `apres`: a function that is executed after the request finishes. See below for more details.
 - `delay`: optional integer that determines how many milliseconds should be waited until the next request.
 - `timeout`: optional integer that will abort the request after `body.timeout` seconds elapse of socket inactivity. Defaults to `60`.
@@ -76,6 +75,8 @@ This function accepts a sequence of requests and executes them in turn. It takes
 `callback` will always receive `error` as its first argument and an array of `rdata`s as its second. If the sequence was completed successfully, `error` will be `undefined`.
 
 In the simplest case, `sequence` can be an array with a number of objects, each of them a valid `options` object that can be passed to `h.one`. However, you can have nested arrays with `options` inside; `h.seq` will unnest the array for you. This is useful when you have functions returning tests.
+
+If any of the components of `sequence` has a falsy value or is an empty array, it will be ignored. This is useful for creating conditional tests. However, these conditions cannot depend on the dynamic `state` of the test; rather, the conditional must depend on a condition that is defined when `h.seq` is invoked.
 
 Finally, you can use a function for converting each of the elements within `sequence` to a valid `h.one` `options` object. For example, the default `h.stdmap` function converts the following array:
 
