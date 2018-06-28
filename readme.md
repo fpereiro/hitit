@@ -4,7 +4,7 @@ hitit is a minimalistic tool for testing an HTTP(S) API. It is a stopgap until I
 
 ## Current status of the project
 
-The current version of hitit, v1.2.0, is considered to be *somewhat stable* and *somewhat complete*. [Suggestions](https://github.com/fpereiro/hitit/issues) and [patches](https://github.com/fpereiro/hitit/pulls) are welcome. Future changes planned are:
+The current version of hitit, v1.2.1, is considered to be *mostly stable* and *mostly complete*. [Suggestions](https://github.com/fpereiro/hitit/issues) and [patches](https://github.com/fpereiro/hitit/pulls) are welcome. Future changes planned are:
 
 - Support for concurrent testing (a.k.a stress testing).
 
@@ -40,6 +40,7 @@ To do a single request, use `h.one`. This function takes three arguments: `state
 - `timeout`: optional integer that will abort the request after `body.timeout` seconds elapse of socket inactivity. Defaults to `60`.
 - `https`: optional boolean. If true, `https` will be used instead of `http`.
 - `rejectUnauthorized`: optional boolean. If `false`, insecure `https` will be accepted by default (this is useful when you're testing with a self-signed certificate).
+- `raw`: optional boolean. If true, the response's body will be returned as a raw buffer.
 
 `state` must also be an object. It serves two purposes: #1 keep state between requests; and #2 have default values for some request parameters. Regarding keeping state between requests, you can assign any key in this object for your own purposes, *as long as is none of the keys that `options` can have*. If you assign a key that is one of the `options` keys (for example, `host`), if `options.host` is `undefined`, `state.host` will be considered as the `host`. This is what enables #2.
 
@@ -92,7 +93,7 @@ In this case, notice that `host` and `port` are not defined and must hence be pa
 
 ## Source code
 
-The complete source code is contained in `hitit.js`. It is about 230 lines long.
+The complete source code is contained in `hitit.js`. It is about 240 lines long.
 
 ## License
 

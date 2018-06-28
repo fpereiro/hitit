@@ -44,7 +44,7 @@ Written by Federico Pereiro (fpereiro@gmail.com) and released into the public do
          function () {return dale.do ({
             string:  ['tag', 'host', 'method', 'path'],
             integer: ['port', 'delay', 'timeout'],
-            boolean: ['https', 'rejectUnauthorized'],
+            boolean: ['https', 'rejectUnauthorized', 'raw'],
             function: 'apres',
             headers: 'object'
          }, function (keys, type) {
@@ -92,28 +92,33 @@ Written by Federico Pereiro (fpereiro@gmail.com) and released into the public do
          path:     o.path,
          rejectUnauthorized: ! o.rejectUnauthorized === false
       }, function (response) {
-         response.setEncoding ('utf8');
-         response.body = '';
+         if (! o.raw) {
+            response.setEncoding ('utf8');
+            response.body = '';
+         }
+         else response.body = [];
 
          response.on ('data', function (buffer) {
-            response.body += buffer.toString ();
+            ! o.raw ? response.body += buffer.toString () : response.body.push (buffer);
          });
 
          response.on ('end', function () {
             var rdata = {
                code:    response.statusCode,
                headers: response.headers,
-               body:    response.body,
+               body:    ! o.raw ? response.body : Buffer.concat (response.body),
                time:    [startTime, Date.now ()],
                request: o
             }
-            var parsed;
-            if ((response.headers ['content-type'] || '').match (/^application\/json/)) {
-               parsed = teishi.p (response.body);
-               if (parsed === false) return cb (dale.obj (0, rdata, function () {
-                  return ['error', 'Invalid JSON!'];
-               }));
-               rdata.body = parsed;
+            if (! o.raw) {
+               var parsed;
+               if ((response.headers ['content-type'] || '').match (/^application\/json/)) {
+                  parsed = teishi.p (response.body);
+                  if (parsed === false) return cb (dale.obj (0, rdata, function () {
+                     return ['error', 'Invalid JSON!'];
+                  }));
+                  rdata.body = parsed;
+               }
             }
 
             if (o.code !== '*' && rdata.code !== (o.code || 200)) return cb (rdata);
