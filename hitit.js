@@ -1,5 +1,5 @@
 /*
-hitit - v1.2.0
+hitit - v1.2.2
 
 Written by Federico Pereiro (fpereiro@gmail.com) and released into the public domain.
 */
@@ -159,10 +159,12 @@ Written by Federico Pereiro (fpereiro@gmail.com) and released into the public do
                queue.push (p);
             }
             if (Math.min.apply (Math, queue) === p) {
-               request.write (what, enc, function () {
+               var cb = function () {
                   queue.splice (queue.indexOf (p), 1);
                   if (queue.length === 0) request.end ();
-               });
+               }
+               if (what.length === 0) cb ();
+               else request.write (what, enc, cb);
             }
             else setTimeout (function () {
                rwrite (what, enc, p);
