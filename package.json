@@ -1,11 +1,11 @@
 {
    "name": "hitit",
-   "version": "1.2.2",
+   "version": "1.2.3",
    "description": "Minimalistic tool for API testing.",
    "dependencies": {
-      "dale":   "4.3.1",
+      "dale":   "4.3.3",
       "mime":   "1.6.0",
-      "teishi": "3.13.0"
+      "teishi": "3.13.2"
    },
    "main": "hitit.js",
    "author": "Federico Pereiro <fpereiro@gmail.com>",

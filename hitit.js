@@ -1,5 +1,5 @@
 /*
-hitit - v1.2.2
+hitit - v1.2.3
 
 Written by Federico Pereiro (fpereiro@gmail.com) and released into the public domain.
 */
@@ -209,8 +209,10 @@ Written by Federico Pereiro (fpereiro@gmail.com) and released into the public do
 
       preproc (seq);
 
+      var t = Date.now ();
+
       var CB = function () {
-         log ('Starting request', fseq [counter].tag, '(' + (counter + 1) + '/' + fseq.length + ')');
+         log ('Starting request (' + (Math.round ((Date.now () - t) / 10) / 100) + 's)', fseq [counter].tag, '(' + (counter + 1) + '/' + fseq.length + ')');
          h.one (state, fseq [counter++], function (error, rdata) {
             if (error) return cb (error, hist);
             hist.push (rdata);
@@ -223,6 +225,7 @@ Written by Federico Pereiro (fpereiro@gmail.com) and released into the public do
    }
 
    h.stdmap = function (req) {
+      if (type (req) !== 'array') return log ('Request passed to h.stdmap must be an array!');
       return {
          tag:     req [0],
          method:  req [1],
