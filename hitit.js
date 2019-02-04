@@ -1,5 +1,5 @@
 /*
-hitit - v1.2.3
+hitit - v1.2.4
 
 Written by Federico Pereiro (fpereiro@gmail.com) and released into the public domain.
 */
@@ -79,6 +79,7 @@ Written by Federico Pereiro (fpereiro@gmail.com) and released into the public do
          o.body = JSON.stringify (o.body);
          if (! o.headers ['content-type']) o.headers ['content-type'] = 'application/json';
       }
+      else if (o.body === undefined) o.body = '';
       else o.body = o.body + '';
 
       if (o.path [0] !== '/') o.path = '/' + o.path;
