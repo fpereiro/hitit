@@ -1,5 +1,5 @@
 /*
-hitit - v1.2.4
+hitit - v1.2.5
 
 Written by Federico Pereiro (fpereiro@gmail.com) and released into the public domain.
 */
@@ -29,7 +29,7 @@ Written by Federico Pereiro (fpereiro@gmail.com) and released into the public do
       }
 
       if (type (o) === 'object' && type (state) === 'object') {
-         dale.do (['tag', 'host', 'port', 'method', 'path', 'body', 'code', 'apres', 'delay', 'timeout', 'https', 'rejectUnauthorized'], function (k) {
+         dale.do (['tag', 'host', 'port', 'method', 'path', 'headers', 'body', 'code', 'apres', 'delay', 'timeout', 'https', 'rejectUnauthorized'], function (k) {
             if (k === 'apres') return;
             if (o [k] === undefined) o [k] = resolve (state [k], k === 'body');
             else                     o [k] = resolve (o [k]);

@@ -1,6 +1,6 @@
 {
    "name": "hitit",
-   "version": "1.2.4",
+   "version": "1.2.5",
    "description": "Minimalistic tool for API testing.",
    "dependencies": {
       "dale":   "4.3.3",
