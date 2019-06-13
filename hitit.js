@@ -1,5 +1,5 @@
 /*
-hitit - v1.2.5
+hitit - v1.2.6
 
 Written by Federico Pereiro (fpereiro@gmail.com) and released into the public domain.
 */
@@ -195,7 +195,7 @@ Written by Federico Pereiro (fpereiro@gmail.com) and released into the public do
          ['map', map, ['function', 'undefined'], 'oneOf'],
       ], cb)) return;
 
-      if (seq.length === 0) return [];
+      if (seq.length === 0) return CB (null, []);
       var fseq    = [];
       var counter = 0;
       var hist    = [];
