@@ -1,5 +1,5 @@
 /*
-hitit - v1.2.6
+hitit - v1.2.7
 
 Written by Federico Pereiro (fpereiro@gmail.com) and released into the public domain.
 */
@@ -17,19 +17,18 @@ Written by Federico Pereiro (fpereiro@gmail.com) and released into the public do
    var mime    = require ('mime');
    var teishi  = require ('teishi');
 
-   var type    = teishi.t;
-   var log     = teishi.l;
+   var type = teishi.type, log = teishi.clog;
 
    var h = exports;
 
    h.one = function (state, o, cb) {
 
       var resolve = function (w, copy) {
-         return type (w) === 'function' ? w (state) : (copy ? teishi.c (w) : w);
+         return type (w) === 'function' ? w (state) : (copy ? teishi.copy (w) : w);
       }
 
       if (type (o) === 'object' && type (state) === 'object') {
-         dale.do (['tag', 'host', 'port', 'method', 'path', 'headers', 'body', 'code', 'apres', 'delay', 'timeout', 'https', 'rejectUnauthorized'], function (k) {
+         dale.go (['tag', 'host', 'port', 'method', 'path', 'headers', 'body', 'code', 'apres', 'delay', 'timeout', 'https', 'rejectUnauthorized'], function (k) {
             if (k === 'apres') return;
             if (o [k] === undefined) o [k] = resolve (state [k], k === 'body');
             else                     o [k] = resolve (o [k]);
@@ -41,19 +40,19 @@ Written by Federico Pereiro (fpereiro@gmail.com) and released into the public do
          ['state',   state, 'object'],
          ['options', o,     'object'],
          ['cb', cb, ['function', 'undefined'], 'oneOf'],
-         function () {return dale.do ({
+         function () {return dale.go ({
             string:  ['tag', 'host', 'method', 'path'],
             integer: ['port', 'delay', 'timeout'],
             boolean: ['https', 'rejectUnauthorized', 'raw'],
             function: 'apres',
             headers: 'object'
          }, function (keys, type) {
-            return dale.do (keys, function (key) {
+            return dale.go (keys, function (key) {
                return ['options.' + key, o [key], [type, 'undefined'], 'oneOf']
             })
          })},
          function () {return [
-            ['o.code', o.code, ['*', undefined, 0, -1].concat (dale.do (http.STATUS_CODES, function (v, k) {return parseInt (k)})), teishi.test.equal, 'oneOf'],
+            ['o.code', o.code, ['*', undefined, 0, -1].concat (dale.go (http.STATUS_CODES, function (v, k) {return parseInt (k)})), teishi.test.equal, 'oneOf'],
             [o.port !== undefined, ['options.port', o.port, {min: 1, max: 65535}, teishi.test.range]],
             [o.method !== undefined, ['options.method', (o.method || ''    ).toLowerCase (), ['get', 'head', 'post', 'put', 'delete', 'trace', 'connect', 'patch', 'options'], teishi.test.equal, 'oneOf']],
          ]},
@@ -67,7 +66,7 @@ Written by Federico Pereiro (fpereiro@gmail.com) and released into the public do
 
       cb = cb || log;
 
-      o.headers = dale.obj (o.headers || {}, teishi.c (state.headers) || {}, function (v, k) {return [k, v]});
+      o.headers = dale.obj (o.headers || {}, teishi.copy (state.headers) || {}, function (v, k) {return [k, v]});
 
       var multipart = type (o.body) === 'object' && o.body.multipart;
       if (multipart) {
@@ -114,7 +113,7 @@ Written by Federico Pereiro (fpereiro@gmail.com) and released into the public do
             if (! o.raw) {
                var parsed;
                if ((response.headers ['content-type'] || '').match (/^application\/json/)) {
-                  parsed = teishi.p (response.body);
+                  parsed = teishi.parse (response.body);
                   if (parsed === false) return cb (dale.obj (0, rdata, function () {
                      return ['error', 'Invalid JSON!'];
                   }));
@@ -172,7 +171,7 @@ Written by Federico Pereiro (fpereiro@gmail.com) and released into the public do
             }, 1);
          }
 
-         dale.do (content, function (v) {
+         dale.go (content, function (v) {
             if (type (v) !== 'object') return log ('Invalid multipart file or field!', v);
             if (v.path && ! v.filename) v.filename = Path.basename (v.path);
             rwrite ('--' + boundary + '\r\n' + 'Content-Disposition: form-data; name="' + v.name + '";');
@@ -180,7 +179,7 @@ Written by Federico Pereiro (fpereiro@gmail.com) and released into the public do
             var contentType = v.contentType || (v.path ? mime.lookup (v.path) : (teishi.complex (v.value) ? 'application/json' : 'text/plain'));
             if (contentType !== 'application/octet-stream') rwrite ('\r\nContent-Type: ' + contentType + '; charset=utf-8');
             rwrite ('\r\n\r\n');
-            rwrite (v.path ? fs.readFileSync (v.path, 'binary') : (teishi.complex (v.value) ? teishi.s (v.value) : v.value + ''), v.path ? 'binary' : 'utf8');
+            rwrite (v.path ? fs.readFileSync (v.path, 'binary') : (teishi.complex (v.value) ? teishi.str (v.value) : v.value + ''), v.path ? 'binary' : 'utf8');
             rwrite ('\r\n');
          });
          rwrite ('--' + boundary + '--\r\n');
@@ -201,7 +200,7 @@ Written by Federico Pereiro (fpereiro@gmail.com) and released into the public do
       var hist    = [];
 
       var preproc = function (seq) {
-         dale.do (seq, function (v) {
+         dale.go (seq, function (v) {
             if (! v || (type (v) === 'array' && v.length === 0)) return;
             if (type (v) === 'array' && teishi.complex (v [0])) preproc (v);
             else fseq.push (map ? map (v) : v);
