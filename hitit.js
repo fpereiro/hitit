@@ -1,5 +1,5 @@
 /*
-hitit - v1.2.7
+hitit - v1.2.8
 
 Written by Federico Pereiro (fpereiro@gmail.com) and released into the public domain.
 */
@@ -171,6 +171,7 @@ Written by Federico Pereiro (fpereiro@gmail.com) and released into the public do
             }, 1);
          }
 
+         // https://github.com/mscdex/busboy/blob/master/lib/types/multipart.js#L174
          dale.go (content, function (v) {
             if (type (v) !== 'object') return log ('Invalid multipart file or field!', v);
             if (v.path && ! v.filename) v.filename = Path.basename (v.path);
@@ -194,7 +195,7 @@ Written by Federico Pereiro (fpereiro@gmail.com) and released into the public do
          ['map', map, ['function', 'undefined'], 'oneOf'],
       ], cb)) return;
 
-      if (seq.length === 0) return CB (null, []);
+      if (seq.length === 0) return cb (null, []);
       var fseq    = [];
       var counter = 0;
       var hist    = [];
